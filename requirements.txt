@@ -1,0 +1,8 @@
+#  DO NOT REMOVE THESE LIBRARIES
+fastapi[standard] 
+uvicorn[standard]
+
+#  ADD YOUR LIBRARIES BELOW THIS LINE
+# ======================================================
+
+# ======================================================
