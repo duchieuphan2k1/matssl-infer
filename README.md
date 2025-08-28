@@ -244,7 +244,7 @@ curl http://localhost:8000/config
 ```
 
 ### Step 7: Docker Testing 
-**📖 Read and follow: `TestDocker.md`**
+**📖 Read and follow: [TestDocker.md](TestDocker.md)**
 
 For production deployment or testing in an isolated environment, you should test your model using Docker:
 
@@ -264,7 +264,7 @@ For production deployment or testing in an isolated environment, you should test
    - Web interface loads at `http://localhost:8000`
    - API endpoints respond correctly
 
-**📋 Important**: Make sure all steps in `TestDocker.md` complete successfully before considering your model deployment-ready.
+**📋 Important**: Make sure all steps in [TestDocker.md](TestDocker.md) complete successfully before considering your model deployment-ready.
 
 
 ## 🔧 Troubleshooting
