@@ -12,12 +12,12 @@ This template provides:
 ## 📋 Step-by-Step Setup
 
 ### Step 1: Configure Your Model's Input and Output
-**File to edit: `utils/config.py`**
+**File to edit: [`utils/config.py`](utils/config.py)**
 
 This file defines what data your model expects as input and what it will return as output.
 
 #### What you need to do:
-1. Open `utils/config.py`
+1. Open [`utils/config.py`](utils/config.py)
 2. Change `MODEL_NAME` to your actual model name (e.g., "image_classifier", "price_predictor")
 3. Update `MODEL_VERSION` if needed
 4. **Configure INPUT_FEATURE_LIST**: This defines what inputs your model needs
@@ -81,7 +81,7 @@ MODEL_PREDICTION_TEMPLATE = [
 - Use type "image" in the MODEL_PREDICTION_TEMPLATE
 
 ### Step 2: Implement Your Model Logic
-**File to edit: `utils/infer.py`**
+**File to edit: [`utils/infer.py`](utils/infer.py)**
 
 This is where you write the actual code that makes predictions.
 
@@ -172,7 +172,7 @@ def run_infer(model_input: list):
 ```
 
 ### Step 3: Install Dependencies
-**File to edit: `requirements.txt`**
+**File to edit: [`requirements.txt`](requirements.txt)** 
 
 Add all the Python packages your model needs.
 
@@ -249,7 +249,7 @@ curl http://localhost:8000/config
 For production deployment or testing in an isolated environment, you should test your model using Docker:
 
 1. **Configure Docker** (if needed):
-   - Change Python version in `Dockerfile` if required
+   - Change Python version in [`Dockerfile`](Dockerfile) if required
    - Switch to GPU-enabled base image if your model needs GPU acceleration
 
 2. **Build and run your model in Docker**:
@@ -271,9 +271,9 @@ For production deployment or testing in an isolated environment, you should test
 
 ### Common Issues:
 
-1. **"ModuleNotFoundError"**: You need to install missing packages in `requirements.txt`
+1. **"ModuleNotFoundError"**: You need to install missing packages in [`requirements.txt`](requirements.txt)
 2. **"Port already in use"**: Change the port number (8001, 8002, etc.)
-3. **"Type verification failed"**: Make sure your input/output matches the types in config.py
+3. **"Type verification failed"**: Make sure your input/output matches the types in [`config.py`](utils/config.py)
 4. **Model not loading**: Check your model file paths and make sure files exist
 
 ### Debug Mode:
