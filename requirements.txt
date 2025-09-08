@@ -2,7 +2,13 @@
 fastapi[standard] 
 uvicorn[standard]
 pandas[standard]
+pillow[standard]
+timm[standard]
+python-multipart[standard]
 
 #  ADD YOUR LIBRARIES BELOW THIS LINE
 # ======================================================
+segmentation_models_pytorch
+torch
+albumentations
 # ======================================================
