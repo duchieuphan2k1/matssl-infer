@@ -48,6 +48,29 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: white;
+        }
+        .image-preview {
+            margin-top: 10px;
+            max-width: 300px;
+            max-height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: none;
+        }
+        .image-result {
+            margin-top: 10px;
+            max-width: 400px;
+            max-height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
         .type-label {
             font-size: 12px;
             color: #666;
@@ -163,31 +186,81 @@
             let fieldsHtml = '';
             
             configData.input_features.forEach(feature => {
-                const inputType = feature.type === 'string' ? 'text' : 'number';
-                const stepAttr = feature.type === 'float' ? 'step="any"' : '';
-                
-                fieldsHtml += `
-                    <div class="input-group">
-                        <label for="input_${feature.name}">${feature.name} <span class="type-label">(${feature.type})</span></label>
-                        <input type="${inputType}" ${stepAttr} id="input_${feature.name}" value="${feature.value}" required>
-                    </div>
-                `;
+                if (feature.type === 'image') {
+                    fieldsHtml += `
+                        <div class="input-group">
+                            <label for="input_${feature.name}">${feature.name} <span class="type-label">(${feature.type})</span></label>
+                            <input type="file" id="input_${feature.name}" accept="image/*" required onchange="previewImage(this, '${feature.name}')">
+                            <img id="preview_${feature.name}" class="image-preview" alt="Image preview">
+                        </div>
+                    `;
+                } else {
+                    const inputType = feature.type === 'string' ? 'text' : 'number';
+                    const stepAttr = feature.type === 'float' ? 'step="any"' : '';
+                    
+                    fieldsHtml += `
+                        <div class="input-group">
+                            <label for="input_${feature.name}">${feature.name} <span class="type-label">(${feature.type})</span></label>
+                            <input type="${inputType}" ${stepAttr} id="input_${feature.name}" value="${feature.value}" required>
+                        </div>
+                    `;
+                }
             });
             
             inputFieldsContainer.innerHTML = fieldsHtml;
         }
 
+        // Preview uploaded image
+        function previewImage(input, featureName) {
+            const preview = document.getElementById(`preview_${featureName}`);
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        // Convert image to base64
+        function imageToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    // Remove data:image/...;base64, prefix
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
         // Collect input data dynamically
-        function collectInputData() {
-            return configData.input_features.map(feature => {
+        async function collectInputData() {
+            const promises = configData.input_features.map(async feature => {
                 const element = document.getElementById(`input_${feature.name}`);
-                let value = element.value;
+                let value;
                 
                 // Convert value based on type
-                if (feature.type === 'int') {
-                    value = parseInt(value);
+                if (feature.type === 'image') {
+                    if (element.files && element.files[0]) {
+                        value = await imageToBase64(element.files[0]);
+                    } else {
+                        throw new Error(`Please select an image for ${feature.name}`);
+                    }
+                } else if (feature.type === 'int') {
+                    value = parseInt(element.value);
                 } else if (feature.type === 'float') {
-                    value = parseFloat(value);
+                    value = parseFloat(element.value);
+                } else {
+                    value = element.value;
                 }
                 
                 return {
@@ -196,6 +269,8 @@
                     type: feature.type
                 };
             });
+            
+            return await Promise.all(promises);
         }
 
         document.getElementById('inferenceForm').addEventListener('submit', async function(e) {
@@ -211,7 +286,7 @@
             
             try {
                 // Collect input data dynamically
-                const modelInput = collectInputData();
+                const modelInput = await collectInputData();
                 
                 // Send request to inference endpoint
                 const response = await fetch('/infer/', {
@@ -230,11 +305,22 @@
                     resultHtml += '<h3>Output:</h3>';
                     
                     result.results.forEach(item => {
-                        resultHtml += `
-                            <div class="result-item">
-                                <strong>${item.name}</strong> (${item.type}): ${item.value}
-                            </div>
-                        `;
+                        if (item.type === 'image') {
+                            // Display image from base64
+                            resultHtml += `
+                                <div class="result-item">
+                                    <strong>${item.name}</strong> (${item.type}):
+                                    <br>
+                                    <img src="data:image/jpeg;base64,${item.value}" class="image-result" alt="Result image">
+                                </div>
+                            `;
+                        } else {
+                            resultHtml += `
+                                <div class="result-item">
+                                    <strong>${item.name}</strong> (${item.type}): ${item.value}
+                                </div>
+                            `;
+                        }
                     });
                     
                     output.innerHTML = resultHtml;
