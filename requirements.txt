@@ -1,8 +1,8 @@
 #  DO NOT REMOVE THESE LIBRARIES
 fastapi[standard] 
 uvicorn[standard]
+pandas[standard]
 
 #  ADD YOUR LIBRARIES BELOW THIS LINE
 # ======================================================
-
 # ======================================================
